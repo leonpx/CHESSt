@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Define CSS variables for light and dark themes */
+:root {
+  /* Light Theme Colors */
+  --background-start-rgb: 240, 240, 240;
+  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 10, 10, 10;
+  --primary-rgb: 37, 99, 235; /* Example blue */
+  --secondary-rgb: 75, 85, 99; /* Example gray */
+  --card-bg-rgb: 255, 255, 255;
+  --card-border-rgb: 220, 220, 220;
+}
+
+/* Apply dark theme variables when .dark class is present */
+.dark {
+  --background-start-rgb: 30, 30, 30;
+  --background-end-rgb: 10, 10, 10;
+  --foreground-rgb: 235, 235, 235;
+  --primary-rgb: 96, 165, 250; /* Lighter blue for dark */
+  --secondary-rgb: 156, 163, 175; /* Lighter gray for dark */
+  --card-bg-rgb: 40, 40, 40;
+  --card-border-rgb: 70, 70, 70;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  /* Apply a subtle gradient background */
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  min-height: 100vh; /* Ensure gradient covers full height */
+}
+
+/* Remove old @theme and @media blocks */
+/* @theme inline { ... } */
+/* @media (prefers-color-scheme: dark) { ... } */
+
+/* Apply Tailwind base, components, utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
