@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client" // Explicitly set output path
+}
+
+datasource db {
+  provider  = "postgresql" // Keep provider as postgresql
+  url       = env("DATABASE_URL") // Pooler URL for Prisma Client
+  directUrl = env("DIRECT_URL")   // Direct URL for Prisma Migrate
+}
+
+// Add this model
+model SavedGame {
+  id             String   @id @default(cuid())
+  userId         String   // Clerk User ID
+  name           String?  // Optional custom name for the game
+  fen            String   // FEN string representing game state
+  moves          String[] // Added to store move history (e.g., SAN or UCI)
+  isGameOver     Boolean  @default(false) // Indicates if the game was finished when saved
+  whiteTime      Int?     // Optional: Remaining white time in seconds
+  blackTime      Int?     // Optional: Remaining black time in seconds
+  isTimerEnabled Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId]) // Index for faster lookups by user
+}
