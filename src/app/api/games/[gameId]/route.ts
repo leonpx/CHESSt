@@ -10,8 +10,7 @@ type SavedGameUpdateData = Prisma.Args<typeof prisma.savedGame, 'update'>['data'
 // PATCH handler for renaming a specific game
 export async function PATCH(request: Request, { params }: { params: { gameId: string } }) {
   const { userId } = await auth();
-  const awaitedParamsPatch = await params;
-  const gameId = awaitedParamsPatch.gameId;
+  const { gameId } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
