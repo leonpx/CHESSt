@@ -1,17 +1,11 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { Chess, Square, PieceSymbol, Piece, Color } from 'chess.js';
+import React, { useState } from 'react';
+import { Chess, Square, PieceSymbol, Color } from 'chess.js';
 
 // Shared constants and types can remain here or move to a separate types file
 const pieceSymbols: { [key in PieceSymbol]: string } = {
   p: '♙', r: '♖', n: '♘', b: '♗', q: '♕', k: '♔',
-};
-
-const squareToIndex = (square: Square): { row: number; col: number } => {
-  const col = square.charCodeAt(0) - 'a'.charCodeAt(0);
-  const row = 8 - parseInt(square.substring(1), 10);
-  return { row, col };
 };
 
 const indexToSquare = (row: number, col: number): Square => {
@@ -32,8 +26,6 @@ interface ChessboardProps {
   capturedPieces?: { w: PieceSymbol[]; b: PieceSymbol[] }; // Make optional
 }
 
-type CapturedPiecesData = { w: PieceSymbol[]; b: PieceSymbol[] };
-
 // --- Component Start --- 
 const Chessboard: React.FC<ChessboardProps> = ({ 
   game, 
@@ -50,25 +42,6 @@ const Chessboard: React.FC<ChessboardProps> = ({
   // Internal UI state only
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [possibleMoves, setPossibleMoves] = useState<Square[]>([]);
-
-  // Remove state managed by parent (game, boardState, timers, gameOverMessage, etc.)
-
-  // --- Internal Helper Functions --- 
-  // This can remain internal if only used for rendering
-  const findKingSquare = (color: Color): Square | null => {
-    const board = game.board(); // Use passed game instance
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        const piece = board[i][j];
-        if (piece && piece.type === 'k' && piece.color === color) {
-          return indexToSquare(i, j);
-        }
-      }
-    }
-    return null;
-  };
-
-  // Remove useEffects for Timer and Game Status - handled by parent
 
   // --- Core Logic Functions --- 
   const getPiece = (square: Square): React.ReactNode => {

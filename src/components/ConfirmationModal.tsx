@@ -18,7 +18,6 @@ interface ConfirmationModalProps {
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ 
   isOpen, 
-  onClose, 
   title, 
   message, 
   actions 
