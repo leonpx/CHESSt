@@ -81,8 +81,7 @@ export async function PATCH(request: Request, { params }: { params: { gameId: st
 // DELETE handler for deleting a specific game
 export async function DELETE(_request: Request, { params }: { params: { gameId: string } }) {
   const { userId } = await auth();
-  const awaitedParamsDelete = await params;
-  const gameId = awaitedParamsDelete.gameId;
+  const { gameId } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -121,8 +120,7 @@ export async function DELETE(_request: Request, { params }: { params: { gameId: 
 // GET handler for fetching a specific game by ID
 export async function GET(_request: Request, { params }: { params: { gameId: string } }) {
   const { userId } = await auth();
-  const awaitedParamsGet = await params;
-  const gameId = awaitedParamsGet.gameId;
+  const { gameId } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
