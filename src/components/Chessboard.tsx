@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Chess, Square, PieceSymbol, Piece, Color } from 'chess.js';
 
 // Shared constants and types can remain here or move to a separate types file

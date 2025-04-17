@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
+// Define a type for the update data payload using Prisma utility types
+type SavedGameUpdateData = Prisma.Args<typeof prisma.savedGame, 'update'>['data'];
 
 // PATCH handler for renaming a specific game
 export async function PATCH(request: Request, { params }: { params: { gameId: string } }) {
@@ -23,7 +26,7 @@ export async function PATCH(request: Request, { params }: { params: { gameId: st
     // Allow updating name or the full game state
     const { name, fen, moves, whiteTime, blackTime, isTimerEnabled, isGameOver } = body;
 
-    const dataToUpdate: any = {}; // Use 'any' or create a specific update type
+    const dataToUpdate: SavedGameUpdateData = {}; // Use the specific type
 
     // Conditionally add fields to the update object
     if (name !== undefined) {

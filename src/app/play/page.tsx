@@ -8,7 +8,7 @@ import { useGameContext } from '@/context/GameContext';
 import { useAuth } from '@clerk/nextjs';
 import { useSearchParams } from 'next/navigation';
 import ConfirmationModal from '@/components/ConfirmationModal';
-import { ConfirmationOptions, ConfirmationAction } from '@/context/GameContext';
+import { ConfirmationOptions } from '@/context/GameContext';
 
 // Define type for captured pieces state
 type CapturedPieces = { w: PieceSymbol[]; b: PieceSymbol[] };
@@ -31,7 +31,7 @@ export default function PlayPage() {
   const [game, setGame] = useState<Chess>(new Chess());
   const [whiteTime, setWhiteTime] = useState<number>(0); // In seconds
   const [blackTime, setBlackTime] = useState<number>(0); // In seconds
-  const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
+  const [, setIsTimerRunning] = useState<boolean>(false); // Keep setter, remove unused state var
   const [gameOverMessage, setGameOverMessage] = useState<string | null>(null);
   const [kingInCheckSquare, setKingInCheckSquare] = useState<Square | null>(null);
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null);
@@ -159,7 +159,6 @@ export default function PlayPage() {
       try {
         // Start from the initial chess position
         const newGame = new Chess(); 
-        const initialFen = newGame.fen(); // Store initial FEN if needed, though not strictly necessary here
 
         // Apply moves if provided (handle potential errors)
         const movesString = searchParams.get('moves');
@@ -175,7 +174,7 @@ export default function PlayPage() {
               let result: Move | null = null; // Declare result outside try
               try {
                  result = newGame.move(move); // Apply SAN move
-              } catch (moveError: any) {
+              } catch (moveError: unknown) {
                 // Check if it's the specific "Invalid move" error from chess.js
                 if (moveError instanceof Error && moveError.message.startsWith('Invalid move:')) {
                   console.warn(`Chess.js threw error for move "${move}" (index ${index}): ${moveError.message}. Stopping history application.`);

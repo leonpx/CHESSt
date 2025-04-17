@@ -1,37 +1,15 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Chess, Move } from 'chess.js';
+import { useParams } from 'next/navigation';
+import { Chess } from 'chess.js';
 import Chessboard from '@/components/Chessboard'; // Assuming Chessboard can be used read-only
 import Link from 'next/link';
 import { SavedGameData } from '@/types'; // Import from the new types file
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/solid'; // Example icons
 
-// Helper to get the starting FEN from a FEN string representing a later position
-// This is a basic implementation; a more robust one might be needed for complex scenarios
-const getStartingFen = (fenWithMoves: string): string => {
-  const parts = fenWithMoves.split(' ');
-  if (parts.length >= 6) {
-    // Reset move counters and potentially en passant square
-    parts[2] = '-'; // Castling rights remain as they were at the start
-    parts[3] = '-'; // Reset en passant
-    parts[4] = '0'; // Reset halfmove clock
-    parts[5] = '1'; // Reset fullmove number
-    // Reconstruct the FEN representing the start of *this specific game*
-    // NOTE: This assumes the initial saved FEN wasn't necessarily the true board start
-    // A better approach might be to always save the *initial* FEN and the moves separately.
-    // For now, we'll work with what we have.
-    console.warn("Attempting to derive starting FEN; may not be 100% accurate for castling/en passant if game didn't start from initial position.");
-    // Let's just load the saved FEN and undo all moves as a simpler approach for now
-    return fenWithMoves; // Revisit this if needed
-  }
-  return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'; // Default start if FEN is invalid
-};
-
 export default function ReplayPage() {
   const params = useParams();
-  const router = useRouter();
   const gameId = params.gameId as string;
 
   const [gameData, setGameData] = useState<SavedGameData | null>(null);
@@ -124,9 +102,6 @@ export default function ReplayPage() {
   }
 
   const totalMoves = gameData.moves.length;
-  const currentMoveNumber = Math.floor((currentMoveIndex + 1) / 2) + 1;
-  const currentTurn = currentMoveIndex === -1 ? 'w' : (currentMoveIndex % 2 === 0 ? 'b' : 'w');
-  const currentMoveSan = currentMoveIndex >= 0 ? gameData.moves[currentMoveIndex] : 'Start';
 
   return (
     <main className="flex flex-grow flex-col items-center justify-center p-2 sm:p-4 md:p-6 gap-4">
