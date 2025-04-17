@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 type SavedGameUpdateData = Prisma.Args<typeof prisma.savedGame, 'update'>['data'];
 
 // PATCH handler for renaming a specific game
-export async function PATCH(request: Request, { params }: { params: { gameId: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ gameId: string }> }) {
   const { userId } = await auth();
   const { gameId } = await params;
 
@@ -78,7 +78,7 @@ export async function PATCH(request: Request, { params }: { params: { gameId: st
 }
 
 // DELETE handler for deleting a specific game
-export async function DELETE(_request: Request, { params }: { params: { gameId: string } }) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ gameId: string }> }) {
   const { userId } = await auth();
   const { gameId } = await params;
 
@@ -117,7 +117,7 @@ export async function DELETE(_request: Request, { params }: { params: { gameId: 
 }
 
 // GET handler for fetching a specific game by ID
-export async function GET(_request: Request, { params }: { params: { gameId: string } }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ gameId: string }> }) {
   const { userId } = await auth();
   const { gameId } = await params;
 
