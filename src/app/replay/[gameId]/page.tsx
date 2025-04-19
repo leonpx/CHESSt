@@ -33,7 +33,7 @@ export default function ReplayPage() {
             }
         }
     } catch(e) {
-        console.error("Error applying moves during replay construction:", e);
+        //console.error("Error applying moves during replay construction:", e);
         // Handle error state? Maybe show message?
     }
     return game;
@@ -57,7 +57,7 @@ export default function ReplayPage() {
         // Start replay at the end by default
         setCurrentMoveIndex(data.moves.length - 1); 
       } catch (err) {
-        console.error("Fetch game error:", err);
+        //console.error("Fetch game error:", err);
         setError(err instanceof Error ? err.message : 'Could not load game');
       } finally {
         setIsLoading(false);

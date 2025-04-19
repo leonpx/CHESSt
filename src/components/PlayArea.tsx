@@ -6,7 +6,7 @@ import { Chess, Square, PieceSymbol, Color, Move } from 'chess.js';
 import Chessboard from '@/components/Chessboard';
 import { useGameContext } from '@/context/GameContext';
 import { useAuth } from '@clerk/nextjs';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import ConfirmationModal from '@/components/ConfirmationModal';
 import { ConfirmationOptions } from '@/context/GameContext';
 
@@ -22,7 +22,8 @@ export default function PlayArea() {
     setSaveAndQuitHandler
   } = useGameContext();
   const { userId } = useAuth();
-  const searchParams = useSearchParams(); // This hook requires Suspense
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   // --- State for Game Setup --- 
   const [isTimerEnabledForSetup, setIsTimerEnabledForSetup] = useState(false);
@@ -72,7 +73,6 @@ export default function PlayArea() {
     const pieceOnTargetSquare = game.get(move.to);
     const pieceOnSourceSquare = game.get(move.from);
     if (pieceOnTargetSquare && pieceOnSourceSquare && pieceOnTargetSquare.color === pieceOnSourceSquare.color) {
-      console.log("Clicked on a friendly piece, not a move.");
       return false;
     }
     const testGame = new Chess();
@@ -80,7 +80,6 @@ export default function PlayArea() {
     try {
       historySAN.forEach(san => testGame.move(san));
     } catch (replayError) {
-      console.error("Internal error: Failed to replay game history for move validation.", replayError);
       return false;
     }
     let moveResult: Move | null = null;
@@ -99,11 +98,9 @@ export default function PlayArea() {
         }
         return true;
       } else {
-        console.log("Move considered illegal by chess.js (returned null):", move);
         return false;
       }
     } catch (e) {
-      console.warn("Invalid move attempted (chess.js error):", e);
       return false;
     }
   }, [game, gameOverMessage]);
@@ -129,7 +126,6 @@ export default function PlayArea() {
     const fenToLoad = searchParams.get('fen');
     const gameIdToLoad = searchParams.get('gameId');
     if (fenToLoad && gameIdToLoad && !isGameActive) {
-      console.log("Attempting to resume game:", gameIdToLoad);
       try {
         const newGame = new Chess();
         const movesString = searchParams.get('moves');
@@ -143,25 +139,19 @@ export default function PlayArea() {
                 result = newGame.move(move);
               } catch (moveError: unknown) {
                 if (moveError instanceof Error && moveError.message.startsWith('Invalid move:')) {
-                  console.warn(`Chess.js threw error for move "${move}" (index ${index}): ${moveError.message}. Stopping history application.`);
                   invalidMoveEncountered = true;
                   return false;
                 } else {
-                  console.warn(`Unexpected error thrown while applying move "${move}" (index ${index}) during resume:`, moveError);
                   throw new Error(`Error processing move history: ${moveError instanceof Error ? moveError.message : moveError}`);
                 }
               }
               if (!result) {
-                console.warn(`Chess.js considered move "${move}" (index ${index}) illegal for the current position. Stopping history application.`);
                 invalidMoveEncountered = true;
                 return false;
               }
             }
             return true;
           });
-        }
-        if (invalidMoveEncountered) {
-          console.warn("Game history was truncated due to invalid/illegal moves found in saved data. Resuming from last valid state.");
         }
         setGame(newGame);
         setIsGameActive(true);
@@ -190,9 +180,7 @@ export default function PlayArea() {
         setLastMove(history.length > 0 ? { from: history[history.length - 1].from, to: history[history.length - 1].to } : null);
         setSaveError(null);
         setIsSaving(false);
-        console.log(`Game ${gameIdToLoad} resumed from query parameters.`);
       } catch (error) {
-        console.error("Failed to resume game from query parameters:", error);
         setIsGameActive(false);
       }
     }
@@ -267,7 +255,14 @@ export default function PlayArea() {
       setIsSaving(false);
       return;
     }
-    const gameState = { fen: game.fen(), moves: game.history(), whiteTime: activeGameTimerEnabled ? whiteTime : null, blackTime: activeGameTimerEnabled ? blackTime : null, isTimerEnabled: activeGameTimerEnabled, isGameOver: gameOverMessage !== null };
+    const gameState = { 
+      fen: game.fen(), 
+      moves: game.history(),
+      whiteTime: activeGameTimerEnabled ? whiteTime : null, 
+      blackTime: activeGameTimerEnabled ? blackTime : null, 
+      isTimerEnabled: activeGameTimerEnabled, 
+      isGameOver: gameOverMessage !== null 
+    };
     const isUpdate = resumedGameId !== null;
     const apiUrl = isUpdate ? `/api/games/${resumedGameId}` : '/api/games/save';
     const method = isUpdate ? 'PATCH' : 'POST';
@@ -276,13 +271,14 @@ export default function PlayArea() {
       if (!response.ok) { const errorData = await response.json().catch(() => ({})); throw new Error(errorData.error || 'Failed to save game'); }
       setIsGameActive(false);
       setResumedGameId(null);
+      router.push('/profile');
     } catch (error) {
-      console.error("Save failed:", error);
+      //console.error("Save failed:", error);
       setSaveError(error instanceof Error ? error.message : 'Unknown save error');
     } finally {
       setIsSaving(false);
     }
-  }, [userId, game, activeGameTimerEnabled, whiteTime, blackTime, gameOverMessage, resumedGameId, setIsGameActive, closeConfirmationModal]); // Added closeConfirmationModal
+  }, [userId, game, activeGameTimerEnabled, whiteTime, blackTime, gameOverMessage, resumedGameId, setIsGameActive, closeConfirmationModal, router]);
 
   useEffect(() => {
     setRequestConfirmationHandler(openConfirmationModal);

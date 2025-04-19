@@ -68,7 +68,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ga
     return NextResponse.json({ message: 'Game updated successfully' }, { status: 200 });
 
   } catch (error) {
-    console.error(`Error updating game ${gameId}:`, error);
+    //console.error(`Error updating game ${gameId}:`, error);
     let errorMessage = 'Failed to update game';
     if (error instanceof Error) errorMessage = error.message;
     return NextResponse.json({ error: errorMessage }, { status: 500 });
@@ -107,7 +107,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return NextResponse.json({ message: 'Game deleted successfully' }, { status: 200 }); // Use 200 OK or 204 No Content
 
   } catch (error) {
-    console.error(`Error deleting game ${gameId}:`, error);
+    //console.error(`Error deleting game ${gameId}:`, error);
     let errorMessage = 'Failed to delete game';
     if (error instanceof Error) errorMessage = error.message;
     return NextResponse.json({ error: errorMessage }, { status: 500 });
@@ -157,7 +157,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ gam
     return NextResponse.json(game, { status: 200 });
 
   } catch (error) {
-    console.error(`Error fetching game ${gameId}:`, error);
+    //console.error(`Error fetching game ${gameId}:`, error);
     let errorMessage = 'Failed to fetch game';
     if (error instanceof Error) errorMessage = error.message;
     return NextResponse.json({ error: errorMessage }, { status: 500 });

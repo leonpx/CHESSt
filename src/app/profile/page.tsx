@@ -45,7 +45,7 @@ export default function ProfilePage() {
       const data: SavedGameData[] = await response.json();
       setSavedGames(data);
     } catch (err) {
-      console.error("Error loading saved games:", err);
+      //console.error("Error loading saved games:", err);
       setError(err instanceof Error ? err.message : 'Could not load saved games');
     } finally {
       setIsLoading(false);
@@ -68,9 +68,6 @@ export default function ProfilePage() {
       alert("Cannot resume a finished game.");
       return;
     }
-    // TODO: Implement logic to resume a game
-    // console.log("Resuming game:", gameData.id, gameData.fen);
-    // alert("Resume functionality not yet implemented."); 
 
     // Prepare data for query params
     const queryParams = new URLSearchParams({
@@ -128,7 +125,7 @@ export default function ProfilePage() {
       cancelRename();
 
     } catch (err) {
-        console.error("Rename failed:", err);
+        //console.error("Rename failed:", err);
         setError(err instanceof Error ? err.message : 'Could not rename game');
         // Optionally, keep the rename input open on error
     } finally {
@@ -154,7 +151,7 @@ export default function ProfilePage() {
           setSavedGames(prevGames => prevGames.filter(g => g.id !== gameId));
 
       } catch (err) {
-          console.error("Delete failed:", err);
+          //console.error("Delete failed:", err);
           setError(err instanceof Error ? err.message : 'Could not delete game');
       } finally {
           setIsSubmitting(false);
