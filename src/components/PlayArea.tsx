@@ -79,7 +79,7 @@ export default function PlayArea() {
     const historySAN = game.history();
     try {
       historySAN.forEach(san => testGame.move(san));
-    } catch (replayError) {
+    } catch (_) {
       return false;
     }
     let moveResult: Move | null = null;
@@ -100,7 +100,7 @@ export default function PlayArea() {
       } else {
         return false;
       }
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }, [game, gameOverMessage]);
@@ -129,24 +129,21 @@ export default function PlayArea() {
       try {
         const newGame = new Chess();
         const movesString = searchParams.get('moves');
-        let invalidMoveEncountered = false;
         if (movesString) {
           const movesToApply = movesString.split(',');
-          movesToApply.every((move, index) => {
+          movesToApply.every((move) => {
             if (move) {
               let result: Move | null = null;
               try {
                 result = newGame.move(move);
               } catch (moveError: unknown) {
                 if (moveError instanceof Error && moveError.message.startsWith('Invalid move:')) {
-                  invalidMoveEncountered = true;
                   return false;
                 } else {
                   throw new Error(`Error processing move history: ${moveError instanceof Error ? moveError.message : moveError}`);
                 }
               }
               if (!result) {
-                invalidMoveEncountered = true;
                 return false;
               }
             }

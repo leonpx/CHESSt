@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image'; // Import next/image
 import { Chess, Square, PieceSymbol, Color } from 'chess.js';
 
 const indexToSquare = (row: number, col: number): Square => {
@@ -54,14 +55,14 @@ const Chessboard: React.FC<ChessboardProps> = ({
     const altText = `${colorName} ${pieceNames[piece.type]}`;
 
     return (
-      <img 
+      <Image 
         src={imageUrl}
         alt={altText}
-        // Use Tailwind classes to scale the image within the square
-        // object-contain prevents distortion
-        className="w-full h-full object-contain p-0.5 sm:p-1"
-        // Prevent image dragging ghost
+        width={150} // Original image width
+        height={150} // Original image height
+        className="w-full h-full object-contain p-0.5 sm:p-1" // CSS handles display size
         draggable="false"
+        unoptimized // Optional: If you DON'T want Vercel/Next.js optimization
       />
     );
   };
@@ -206,13 +207,15 @@ const Chessboard: React.FC<ChessboardProps> = ({
       const altText = `${colorName} ${pieceNames[pieceSymbol]}`;
 
       return (
-        <img
+        <Image
           key={`${color}-${pieceSymbol}-${index}`}
           src={imageUrl}
           alt={altText}
-          // Adjust size for captured piece display
-          className="w-4 h-4 sm:w-5 sm:h-5 object-contain"
+          width={150} // Original image width
+          height={150} // Original image height
+          className="w-4 h-4 sm:w-5 sm:h-5 object-contain" // CSS handles display size
           draggable="false"
+          unoptimized // Optional: If you DON'T want Vercel/Next.js optimization
         />
       );
     })}

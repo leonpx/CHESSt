@@ -32,7 +32,7 @@ export default function ReplayPage() {
                 game.move(gameData.moves[i]);
             }
         }
-    } catch(e) {
+    } catch(_) {
         //console.error("Error applying moves during replay construction:", e);
         // Handle error state? Maybe show message?
     }
