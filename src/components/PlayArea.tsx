@@ -79,7 +79,7 @@ export default function PlayArea() {
     const historySAN = game.history();
     try {
       historySAN.forEach(san => testGame.move(san));
-    } catch (_) {
+    } catch {
       return false;
     }
     let moveResult: Move | null = null;
@@ -100,7 +100,7 @@ export default function PlayArea() {
       } else {
         return false;
       }
-    } catch (_) {
+    } catch {
       return false;
     }
   }, [game, gameOverMessage]);
@@ -177,7 +177,7 @@ export default function PlayArea() {
         setLastMove(history.length > 0 ? { from: history[history.length - 1].from, to: history[history.length - 1].to } : null);
         setSaveError(null);
         setIsSaving(false);
-      } catch (error) {
+      } catch {
         setIsGameActive(false);
       }
     }
