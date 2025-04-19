@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
   '/play',
   '/sign-in(.*)', // Clerk sign-in routes
   '/sign-up(.*)', // Clerk sign-up routes
+  '/pieces/(.*)', // Add pattern for piece images
   // Add any other public static files or API routes here if needed
 ]);
 

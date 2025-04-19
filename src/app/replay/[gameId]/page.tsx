@@ -131,14 +131,14 @@ export default function ReplayPage() {
           <button 
             onClick={() => goToMove(-1)}
             disabled={currentMoveIndex === -1}
-            className="px-3 py-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 rounded disabled:opacity-50"
+            className="px-3 py-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 rounded disabled:opacity-50 text-gray-800"
           >
             Start
           </button>
           <button 
             onClick={() => goToMove(currentMoveIndex - 1)}
             disabled={currentMoveIndex === -1}
-            className="p-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 rounded disabled:opacity-50"
+            className="p-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 rounded disabled:opacity-50 text-gray-800"
             aria-label="Previous move"
           >
             <ArrowLeftIcon className="h-5 w-5" />
@@ -146,7 +146,7 @@ export default function ReplayPage() {
           <button 
             onClick={() => goToMove(currentMoveIndex + 1)}
             disabled={currentMoveIndex >= totalMoves - 1}
-            className="p-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 rounded disabled:opacity-50"
+            className="p-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 rounded disabled:opacity-50 text-gray-800"
             aria-label="Next move"
           >
             <ArrowRightIcon className="h-5 w-5" />
@@ -154,7 +154,7 @@ export default function ReplayPage() {
           <button 
             onClick={() => goToMove(totalMoves - 1)}
             disabled={currentMoveIndex >= totalMoves - 1}
-            className="px-3 py-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 rounded disabled:opacity-50"
+            className="px-3 py-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 rounded disabled:opacity-50 text-gray-800"
           >
             End
           </button>

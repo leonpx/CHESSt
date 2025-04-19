@@ -3,11 +3,6 @@
 import React, { useState } from 'react';
 import { Chess, Square, PieceSymbol, Color } from 'chess.js';
 
-// Shared constants and types can remain here or move to a separate types file
-const pieceSymbols: { [key in PieceSymbol]: string } = {
-  p: '♙', r: '♖', n: '♘', b: '♗', q: '♕', k: '♔',
-};
-
 const indexToSquare = (row: number, col: number): Square => {
   return `${String.fromCharCode('a'.charCodeAt(0) + col)}${8 - row}` as Square;
 };
@@ -47,14 +42,28 @@ const Chessboard: React.FC<ChessboardProps> = ({
   const getPiece = (square: Square): React.ReactNode => {
     const piece = game.get(square); // Use passed game instance
     if (!piece) return null;
-    const symbol = pieceSymbols[piece.type];
-    const colorClass = piece.color === 'w' 
-        ? 'text-gray-100 dark:text-gray-100' 
-        : 'text-gray-800 dark:text-gray-300';
-    const shadowStyle = piece.color === 'w' 
-        ? { textShadow: '0 0 3px rgba(0,0,0,0.7)' } 
-        : { textShadow: '0 0 2px rgba(255,255,255,0.5)' };
-    return <span className={`${colorClass} text-3xl sm:text-4xl font-bold`} style={shadowStyle}>{symbol}</span>;
+
+    // Construct the image path assuming images are in /public/pieces/
+    const imageUrl = `/pieces/${piece.color}${piece.type}.png`;
+
+    // Define alt text based on piece
+    const pieceNames: { [key in PieceSymbol]: string } = {
+      p: 'Pawn', r: 'Rook', n: 'Knight', b: 'Bishop', q: 'Queen', k: 'King'
+    };
+    const colorName = piece.color === 'w' ? 'White' : 'Black';
+    const altText = `${colorName} ${pieceNames[piece.type]}`;
+
+    return (
+      <img 
+        src={imageUrl}
+        alt={altText}
+        // Use Tailwind classes to scale the image within the square
+        // object-contain prevents distortion
+        className="w-full h-full object-contain p-0.5 sm:p-1"
+        // Prevent image dragging ghost
+        draggable="false"
+      />
+    );
   };
 
   // Updated handleSquareClick to call parent's onMove
@@ -107,7 +116,14 @@ const Chessboard: React.FC<ChessboardProps> = ({
   };
 
   // --- Render Logic --- 
-  // Uses props like game, gameOverMessage, kingInCheckSquare, lastMove, capturedPieces
+  const lightSquareColor = '#eeeed2'; // Light buff/beige
+  const darkSquareColor = '#769656'; // Dark green
+
+  const lastMoveHighlightColor = '#BCC944'; // New color for last move highlight
+  const checkHighlightColor = '#f05a5a'; // Opaque reddish highlight (hex equivalent of rgb(240, 90, 90))
+  const selectedBorderColor = 'rgba(30, 144, 255, 0.9)'; // Dodger blue like
+  const possibleMoveDotColor = 'rgba(0, 0, 0, 0.2)'; // Dark translucent dot
+
   const boardSize = 8;
   const squares = [];
   for (let i = 0; i < boardSize; i++) {
@@ -116,38 +132,55 @@ const Chessboard: React.FC<ChessboardProps> = ({
       const isDark = (i + j) % 2 !== 0;
       const isSelected = square === selectedSquare;
       const isPossibleMove = possibleMoves.includes(square);
-      // Use props passed down
-      const isInCheck = square === kingInCheckSquare; 
+      const isInCheck = square === kingInCheckSquare;
       const isLastMoveFrom = lastMove?.from === square;
       const isLastMoveTo = lastMove?.to === square;
       const pieceContent = getPiece(square);
 
-      const lightSquareBg = 'bg-green-100 dark:bg-emerald-800';
-      const darkSquareBg = 'bg-green-700 dark:bg-emerald-600';
-      const lastMoveLightBg = 'bg-yellow-300/60 dark:bg-yellow-400/40';
-      const lastMoveDarkBg = 'bg-yellow-500/60 dark:bg-yellow-600/40';
-      const checkBg = 'bg-red-500/70 dark:bg-red-600/60';
-      const selectedBorder = 'border-4 border-blue-500 dark:border-blue-400';
-      const possibleMoveBg = 'bg-blue-500 dark:bg-blue-400';
+      // Determine background color
+      let bgColor = isDark ? darkSquareColor : lightSquareColor;
+      if (isInCheck) bgColor = checkHighlightColor;
+      else if (isLastMoveFrom || isLastMoveTo) bgColor = lastMoveHighlightColor;
+
+      // Determine border style
+      const borderStyle = isSelected ? { boxShadow: `inset 0 0 0 4px ${selectedBorderColor}` } : {};
+
+      // Determine text color for labels based on square color
+      const labelColor = isDark ? 'text-gray-200/70' : 'text-gray-800/70';
 
       squares.push(
         <div 
           key={`${i}-${j}`} 
           className={`
             w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 
-            flex items-center justify-center cursor-pointer relative transition-colors duration-150 ease-in-out
-            ${isInCheck ? checkBg :
-              isLastMoveFrom || isLastMoveTo ? (isDark ? lastMoveDarkBg : lastMoveLightBg) :
-              (isDark ? darkSquareBg : lightSquareBg)
-            }
-            ${isSelected ? selectedBorder : ''}
-          `} 
+            flex items-center justify-center cursor-pointer relative 
+          `}
+          style={{ 
+            backgroundColor: bgColor, 
+            ...borderStyle, 
+            transition: 'background-color 0.1s ease-in-out',
+            pointerEvents: (!allowMoves || gameOverMessage) ? 'none' : 'auto'
+          }}
           onClick={() => allowMoves && handleSquareClick(square)} // Only trigger click handler if moves are allowed
-          style={{ pointerEvents: (!allowMoves || gameOverMessage) ? 'none' : 'auto' }} // Use prop for pointer events too
         >
+          {/* Rank Label (Numbers on the left) */}
+          {j === 0 && (
+            <span className={`absolute top-0 left-1 text-xs font-bold ${labelColor} select-none pointer-events-none`}>
+              {8 - i}
+            </span>
+          )}
+          {/* File Label (Letters on the bottom) */}
+          {i === 7 && (
+            <span className={`absolute bottom-0 right-1 text-xs font-bold ${labelColor} select-none pointer-events-none`}>
+              {String.fromCharCode('a'.charCodeAt(0) + j)}
+            </span>
+          )}
           {pieceContent}
           {isPossibleMove && (
-            <div className={`absolute w-3 h-3 sm:w-4 sm:h-4 ${possibleMoveBg} rounded-full opacity-60 pointer-events-none`}></div>
+            <div 
+              className={`absolute w-1/3 h-1/3 rounded-full pointer-events-none`}
+              style={{ backgroundColor: possibleMoveDotColor }}
+            ></div>
           )}
         </div>
       );
@@ -156,21 +189,35 @@ const Chessboard: React.FC<ChessboardProps> = ({
 
   // Component to display captured pieces (use prop)
   const CapturedPiecesDisplay: React.FC<{ pieces: PieceSymbol[], color: Color }> = ({ pieces, color }) => (
-    <div className={`flex flex-wrap gap-1 p-2 min-h-[40px] border border-[rgb(var(--card-border-rgb))] rounded bg-[rgba(var(--card-bg-rgb),0.7)] dark:bg-gray-800/60 shadow-inner ${color === 'w' ? 'justify-start' : 'justify-end'} flex-grow`}>
-      {pieces.length === 0 && (
-        <span className="text-[rgb(var(--secondary-rgb))] dark:text-gray-500 text-sm italic self-center">No captures</span>
-      )}
-      {pieces.map((piece, index) => (
-        <span 
-          key={`${color}-${piece}-${index}`}
-          className={`text-lg sm:text-xl text-[rgb(var(--foreground-rgb))]`}
-          style={{ textShadow: '0 0 1px rgba(0,0,0,0.3)' }}
-        >
-          {pieceSymbols[piece]}
-        </span>
-      ))}
-    </div>
-  );
+  <div className={`flex flex-wrap items-center gap-0.5 sm:gap-1 p-1 sm:p-2 min-h-[32px] sm:min-h-[40px] border border-[rgb(var(--card-border-rgb))] rounded bg-[rgba(var(--card-bg-rgb),0.7)] dark:bg-gray-800/60 shadow-inner ${color === 'w' ? 'justify-start' : 'justify-end'} flex-grow`}>
+    {pieces.length === 0 && (
+      <span className="text-[rgb(var(--secondary-rgb))] dark:text-gray-500 text-sm italic self-center">No captures</span>
+    )}
+    {pieces.map((pieceSymbol, index) => {
+      // Determine the actual color of the captured piece
+      const capturedPieceColor = color === 'w' ? 'w' : 'b'; 
+      const imageUrl = `/pieces/${capturedPieceColor}${pieceSymbol}.png`;
+
+      // Define alt text based on piece
+      const pieceNames: { [key in PieceSymbol]: string } = {
+        p: 'Pawn', r: 'Rook', n: 'Knight', b: 'Bishop', q: 'Queen', k: 'King'
+      };
+      const colorName = capturedPieceColor === 'w' ? 'White' : 'Black';
+      const altText = `${colorName} ${pieceNames[pieceSymbol]}`;
+
+      return (
+        <img
+          key={`${color}-${pieceSymbol}-${index}`}
+          src={imageUrl}
+          alt={altText}
+          // Adjust size for captured piece display
+          className="w-4 h-4 sm:w-5 sm:h-5 object-contain"
+          draggable="false"
+        />
+      );
+    })}
+  </div>
+);
 
   // Timer display component (use props)
   const TimerDisplay: React.FC<{ time: number, isBlack: boolean }> = ({ time, isBlack }) => {
@@ -214,9 +261,8 @@ const Chessboard: React.FC<ChessboardProps> = ({
       </div>
 
       {/* Chessboard Grid */}
-      <div className="grid grid-cols-8 w-[320px] h-[320px] sm:w-[448px] sm:h-[448px] md:w-[512px] md:h-[512px] border-2 sm:border-4 border-[rgb(var(--card-border-rgb))] dark:border-gray-600 shadow-lg relative">
+      <div className="grid grid-cols-8 w-[320px] h-[320px] sm:w-[448px] sm:h-[448px] md:w-[512px] md:h-[512px] border-2 sm:border-4 border-[rgb(var(--card-border-rgb))] dark:border-gray-600 shadow-lg">
         {squares}
-        {gameOverMessage && (<div className="absolute inset-0 bg-black/50 dark:bg-black/60 flex items-center justify-center pointer-events-none"></div>)} { /* Use prop */}
       </div>
 
       {/* Bottom row */}
