@@ -190,39 +190,66 @@ const Chessboard: React.FC<ChessboardProps> = ({
     }
   }
 
-  // Component to display captured pieces (use prop)
-  const CapturedPiecesDisplay: React.FC<{ pieces: PieceSymbol[], color: Color }> = ({ pieces, color }) => (
-  <div className={`flex flex-wrap items-center gap-0.5 sm:gap-1 p-1 sm:p-2 min-h-[32px] sm:min-h-[40px] border border-[rgb(var(--card-border-rgb))] rounded bg-[rgba(var(--card-bg-rgb),0.7)] dark:bg-gray-800/60 shadow-inner ${color === 'w' ? 'justify-start' : 'justify-end'} flex-grow`}>
-    {pieces.length === 0 && (
-      <span className="text-[rgb(var(--secondary-rgb))] dark:text-gray-500 text-sm italic self-center">No captures</span>
-    )}
-    {pieces.map((pieceSymbol, index) => {
-      // Determine the actual color of the captured piece
-      const capturedPieceColor = color === 'w' ? 'w' : 'b'; 
-      const imageUrl = `/pieces/${capturedPieceColor}${pieceSymbol}.png`;
+  // Component to display captured pieces using CSS Sprites
+  const CapturedPiecesDisplay: React.FC<{ pieces: PieceSymbol[], color: Color }> = ({ pieces, color }) => {
+    // Count the occurrences of each piece type
+    const counts = pieces.reduce((acc, piece) => {
+      acc[piece] = (acc[piece] || 0) + 1;
+      return acc;
+    }, {} as Record<PieceSymbol, number>);
 
-      // Define alt text based on piece
-      const pieceNames: { [key in PieceSymbol]: string } = {
-        p: 'Pawn', r: 'Rook', n: 'Knight', b: 'Bishop', q: 'Queen', k: 'King'
-      };
-      const colorName = capturedPieceColor === 'w' ? 'White' : 'Black';
-      const altText = `${colorName} ${pieceNames[pieceSymbol]}`;
+    const pieceOrder: PieceSymbol[] = ['p', 'n', 'b', 'r', 'q']; // Order to display pieces
+    const capturedPieceColor = color === 'w' ? 'w' : 'b'; // This is the color *of* the captured pieces
 
-      return (
-        <Image
-          key={`${color}-${pieceSymbol}-${index}`}
-          src={imageUrl}
-          alt={altText}
-          width={150} // Original image width
-          height={150} // Original image height
-          className="w-4 h-4 sm:w-5 sm:h-5 object-contain" // CSS handles display size
-          draggable="false"
-          unoptimized // Optional: If you DON'T want Vercel/Next.js optimization
-        />
-      );
-    })}
-  </div>
-);
+    const elements = pieceOrder.reduce((acc, pieceType) => {
+      const count = counts[pieceType] || 0;
+      if (count > 0) {
+        let className = 'captured-pieces-cpiece';
+        let numSuffix = count > 1 ? `${count}-` : ''; // e.g., "2-", "3-"
+        let pluralSuffix = count > 1 ? 's' : ''; // e.g., "pawns", "knights"
+
+        // Map PieceSymbol to string name for class
+        const pieceNameMap: Record<PieceSymbol, string> = {
+          p: 'pawn',
+          n: 'knight',
+          b: 'bishop',
+          r: 'rook',
+          q: 'queen',
+          k: 'king' // King shouldn't be captured, but include for completeness
+        };
+        const pieceName = pieceNameMap[pieceType];
+
+        // Handle specific cases where CSS class might not follow simple pattern (e.g., queen)
+        if (pieceType === 'q' && count > 1) {
+          // If sprite doesn't have 2+ queens, render multiple single queens
+          for (let i = 0; i < count; i++) {
+            acc.push(<span key={`${capturedPieceColor}-${pieceType}-${i}`} className={`captured-pieces-cpiece captured-pieces-${capturedPieceColor}-queen`} />);
+          }
+        } else if (count > 8 && pieceType === 'p') {
+          // Handle more than 8 pawns if needed (render 8 + singles)
+          acc.push(<span key={`${capturedPieceColor}-p-8`} className={`captured-pieces-cpiece captured-pieces-${capturedPieceColor}-8-pawns`} />);
+          for (let i = 8; i < count; i++) {
+            acc.push(<span key={`${capturedPieceColor}-p-${i}`} className={`captured-pieces-cpiece captured-pieces-${capturedPieceColor}-pawn`} />);
+          }
+        } else {
+          // Default case: construct class like captured-pieces-w-3-pawns
+          className += ` captured-pieces-${capturedPieceColor}-${numSuffix}${pieceName}${pluralSuffix}`;
+          acc.push(<span key={`${capturedPieceColor}-${pieceType}-${count}`} className={className} />);
+        }
+      }
+      return acc;
+    }, [] as React.ReactElement[]);
+
+    return (
+      <div className={`flex flex-wrap items-end gap-x-1 p-1 min-h-[32px] sm:min-h-[40px] border border-[rgb(var(--card-border-rgb))] rounded bg-[rgba(var(--card-bg-rgb),0.7)] dark:bg-gray-800/60 shadow-inner ${color === 'w' ? 'justify-start' : 'justify-end'} flex-grow`}>
+        {elements.length === 0 ? (
+          <span className="text-[rgb(var(--secondary-rgb))] dark:text-gray-500 text-sm italic self-center">No captures</span>
+        ) : (
+          elements
+        )}
+      </div>
+    );
+  };
 
   // Timer display component (use props)
   const TimerDisplay: React.FC<{ time: number, isBlack: boolean }> = ({ time, isBlack }) => {
