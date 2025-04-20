@@ -39,7 +39,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.8)]">
       <div className="bg-[rgb(var(--card-bg-rgb))] dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md mx-4 border border-[rgb(var(--card-border-rgb))] dark:border-gray-700">
         <h2 className="text-xl font-semibold mb-4 text-[rgb(var(--foreground-rgb))]">{title}</h2>
         <p className="mb-6 text-[rgb(var(--secondary-rgb))]">{message}</p>

@@ -50,6 +50,11 @@ export default function PlayArea() {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   // --- Local Confirmation Logic --- 
+  const closeConfirmationModal = useCallback(() => {
+    setIsConfirmModalOpen(false);
+    setConfirmationOptions(null);
+  }, [setIsConfirmModalOpen, setConfirmationOptions]);
+
   const openConfirmationModal = useCallback((options: ConfirmationOptions) => {
     const wrappedActions = options.actions.map(action => ({
       ...action,
@@ -60,12 +65,7 @@ export default function PlayArea() {
     }));
     setConfirmationOptions({ ...options, actions: wrappedActions });
     setIsConfirmModalOpen(true);
-  }, []);
-
-  const closeConfirmationModal = () => {
-    setIsConfirmModalOpen(false);
-    setConfirmationOptions(null);
-  };
+  }, [closeConfirmationModal]);
 
   // --- Game Logic Callbacks --- 
   const handleMove = useCallback((move: { from: Square; to: Square; promotion?: PieceSymbol }): boolean => {
