@@ -31,7 +31,7 @@ export default function Header() {
               await triggerSaveAndQuit(); // Call the save handler from context
               // Navigation happens regardless of save success/failure for now.
               // A more robust solution would check save status before navigating.
-            } catch (error) {
+            } catch {
               //console.error("Error during Save and Quit from header:", error);
               // Optionally show an error message to the user
             }

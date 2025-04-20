@@ -205,8 +205,8 @@ const Chessboard: React.FC<ChessboardProps> = ({
       const count = counts[pieceType] || 0;
       if (count > 0) {
         let className = 'captured-pieces-cpiece';
-        let numSuffix = count > 1 ? `${count}-` : ''; // e.g., "2-", "3-"
-        let pluralSuffix = count > 1 ? 's' : ''; // e.g., "pawns", "knights"
+        const numSuffix = count > 1 ? `${count}-` : ''; // e.g., "2-", "3-"
+        const pluralSuffix = count > 1 ? 's' : ''; // e.g., "pawns", "knights"
 
         // Map PieceSymbol to string name for class
         const pieceNameMap: Record<PieceSymbol, string> = {

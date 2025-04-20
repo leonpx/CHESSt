@@ -36,7 +36,7 @@ export async function GET() {
 
     return NextResponse.json(savedGames, { status: 200 });
 
-  } catch (error) {
+  } catch {
     //console.error('Error fetching games:', error);
     return NextResponse.json({ error: 'Failed to fetch games' }, { status: 500 });
   } finally {
