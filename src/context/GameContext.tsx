@@ -43,7 +43,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (requestConfirmationHandlerRef.current) {
       requestConfirmationHandlerRef.current(options);
     } else {
-      console.warn('requestConfirmation called before a handler was provided.');
       // Basic fallback if needed, e.g., window.confirm
       // if (window.confirm(options.message)) { 
       //   const confirmAction = options.actions.find(a => a.label !== 'Cancel');
@@ -56,7 +55,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (saveAndQuitHandlerRef.current) {
       await saveAndQuitHandlerRef.current();
     } else {
-      console.warn('triggerSaveAndQuit called before a handler was provided.');
       // Cannot proceed without the handler, maybe throw error or just log
     }
   }, []);

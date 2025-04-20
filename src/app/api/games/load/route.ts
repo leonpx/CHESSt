@@ -37,7 +37,7 @@ export async function GET() {
     return NextResponse.json(savedGames, { status: 200 });
 
   } catch (error) {
-    console.error('Error fetching games:', error);
+    //console.error('Error fetching games:', error);
     return NextResponse.json({ error: 'Failed to fetch games' }, { status: 500 });
   } finally {
     await prisma.$disconnect();

@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Game saved successfully', gameId: savedGame.id }, { status: 201 });
 
   } catch (error) {
-    console.error('Error saving game:', error);
+    //console.error('Error saving game:', error);
 
     // Determine the error message
     let errorMessage = 'Failed to save game';

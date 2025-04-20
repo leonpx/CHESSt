@@ -32,7 +32,7 @@ export default function Header() {
               // Navigation happens regardless of save success/failure for now.
               // A more robust solution would check save status before navigating.
             } catch (error) {
-              console.error("Error during Save and Quit from header:", error);
+              //console.error("Error during Save and Quit from header:", error);
               // Optionally show an error message to the user
             }
             router.push(targetHref); // Navigate after attempting save
